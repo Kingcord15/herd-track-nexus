@@ -1,14 +1,36 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import LoginForm from '@/components/auth/LoginForm';
+import AdminDashboard from '@/components/dashboard/AdminDashboard';
+import FarmerDashboard from '@/components/dashboard/FarmerDashboard';
+
+interface User {
+  email: string;
+  userType: 'admin' | 'farmer';
+  name: string;
+  id: string;
+}
 
 const Index = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+  const [user, setUser] = useState<User | null>(null);
+
+  const handleLogin = (userType: 'admin' | 'farmer', userData: User) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  if (!user) {
+    return <LoginForm onLogin={handleLogin} />;
+  }
+
+  if (user.userType === 'admin') {
+    return <AdminDashboard onLogout={handleLogout} />;
+  }
+
+  return <FarmerDashboard onLogout={handleLogout} />;
 };
 
 export default Index;

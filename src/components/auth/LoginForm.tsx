@@ -1,0 +1,128 @@
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { User, Lock, Users } from 'lucide-react';
+
+interface LoginFormProps {
+  onLogin: (userType: 'admin' | 'farmer', userData: any) => void;
+}
+
+const LoginForm = ({ onLogin }: LoginFormProps) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [userType, setUserType] = useState<'admin' | 'farmer'>('farmer');
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Simulate login validation
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    if (email && password) {
+      const userData = {
+        email,
+        userType,
+        name: userType === 'admin' ? 'System Administrator' : 'John Farmer',
+        id: userType === 'admin' ? 'admin-001' : 'farmer-001'
+      };
+      
+      onLogin(userType, userData);
+      toast({
+        title: "Login Successful",
+        description: `Welcome to HERD TRACK SYSTEM, ${userData.name}!`,
+      });
+    } else {
+      toast({
+        title: "Login Failed",
+        description: "Please enter valid credentials",
+        variant: "destructive",
+      });
+    }
+    
+    setIsLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-2xl">
+        <CardHeader className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 bg-green-600 rounded-full flex items-center justify-center">
+            <Users className="w-8 h-8 text-white" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-gray-800">HERD TRACK SYSTEM</CardTitle>
+          <CardDescription>Secure login for cattle management</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="userType">User Type</Label>
+              <Select value={userType} onValueChange={(value: 'admin' | 'farmer') => setUserType(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select user type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="farmer">Farmer</SelectItem>
+                  <SelectItem value="admin">Administrator</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+            
+            <Button 
+              type="submit" 
+              className="w-full bg-green-600 hover:bg-green-700"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </Button>
+            
+            <div className="text-center text-sm text-gray-600">
+              <a href="#" className="hover:text-green-600">Forgot password?</a>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default LoginForm;
