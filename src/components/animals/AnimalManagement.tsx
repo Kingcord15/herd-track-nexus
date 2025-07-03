@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2, Users } from 'lucide-react';
+import { Plus, Edit, Trash2, Users, Map, Grid } from 'lucide-react';
+import AnimalMap from './AnimalMap';
 
 interface Animal {
   id: string;
@@ -55,6 +55,8 @@ const AnimalManagement = ({ selectedBranch }: AnimalManagementProps) => {
   const filteredAnimals = selectedBranch 
     ? animals.filter(animal => animal.branchId === selectedBranch)
     : animals;
+
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,162 +143,188 @@ const AnimalManagement = ({ selectedBranch }: AnimalManagementProps) => {
             {selectedBranch ? `Animals in selected farm` : 'All animals across your farms'}
           </p>
         </div>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-green-600 hover:bg-green-700">
-              <Plus className="w-4 h-4 mr-2" />
-              Add New Animal
+        <div className="flex space-x-2">
+          <div className="flex rounded-md border">
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('grid')}
+              className="rounded-r-none"
+            >
+              <Grid className="w-4 h-4 mr-2" />
+              Grid
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>{editingAnimal ? 'Edit Animal' : 'Add New Animal'}</DialogTitle>
-              <DialogDescription>
-                {editingAnimal ? 'Update animal details' : 'Enter details for the new animal'}
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="tagId">Tag ID</Label>
-                <Input
-                  id="tagId"
-                  value={formData.tagId}
-                  onChange={(e) => setFormData({ ...formData, tagId: e.target.value })}
-                  placeholder="e.g., COW-001"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="breed">Breed</Label>
-                <Input
-                  id="breed"
-                  value={formData.breed}
-                  onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
-                  placeholder="e.g., Holstein"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="age">Age (years)</Label>
-                  <Input
-                    id="age"
-                    type="number"
-                    value={formData.age}
-                    onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-                    placeholder="3"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="weight">Weight (kg)</Label>
-                  <Input
-                    id="weight"
-                    type="number"
-                    value={formData.weight}
-                    onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                    placeholder="450"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="healthStatus">Health Status</Label>
-                <Select value={formData.healthStatus} onValueChange={(value: Animal['healthStatus']) => setFormData({ ...formData, healthStatus: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Healthy">Healthy</SelectItem>
-                    <SelectItem value="Sick">Sick</SelectItem>
-                    <SelectItem value="Under Treatment">Under Treatment</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="branchId">Farm</Label>
-                <Select value={formData.branchId} onValueChange={(value) => setFormData({ ...formData, branchId: value })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {branches.map((branch) => (
-                      <SelectItem key={branch.id} value={branch.id}>
-                        {branch.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
-                {editingAnimal ? 'Update Animal' : 'Add Animal'}
+            <Button
+              variant={viewMode === 'map' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setViewMode('map')}
+              className="rounded-l-none"
+            >
+              <Map className="w-4 h-4 mr-2" />
+              Map
+            </Button>
+          </div>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-green-600 hover:bg-green-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Add New Animal
               </Button>
-            </form>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>{editingAnimal ? 'Edit Animal' : 'Add New Animal'}</DialogTitle>
+                <DialogDescription>
+                  {editingAnimal ? 'Update animal details' : 'Enter details for the new animal'}
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="tagId">Tag ID</Label>
+                  <Input
+                    id="tagId"
+                    value={formData.tagId}
+                    onChange={(e) => setFormData({ ...formData, tagId: e.target.value })}
+                    placeholder="e.g., COW-001"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="breed">Breed</Label>
+                  <Input
+                    id="breed"
+                    value={formData.breed}
+                    onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
+                    placeholder="e.g., Holstein"
+                    required
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="age">Age (years)</Label>
+                    <Input
+                      id="age"
+                      type="number"
+                      value={formData.age}
+                      onChange={(e) => setFormData({ ...formData, age: e.target.value })}
+                      placeholder="3"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="weight">Weight (kg)</Label>
+                    <Input
+                      id="weight"
+                      type="number"
+                      value={formData.weight}
+                      onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                      placeholder="450"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="healthStatus">Health Status</Label>
+                  <Select value={formData.healthStatus} onValueChange={(value: Animal['healthStatus']) => setFormData({ ...formData, healthStatus: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Healthy">Healthy</SelectItem>
+                      <SelectItem value="Sick">Sick</SelectItem>
+                      <SelectItem value="Under Treatment">Under Treatment</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="branchId">Farm</Label>
+                  <Select value={formData.branchId} onValueChange={(value) => setFormData({ ...formData, branchId: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {branches.map((branch) => (
+                        <SelectItem key={branch.id} value={branch.id}>
+                          {branch.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
+                  {editingAnimal ? 'Update Animal' : 'Add Animal'}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredAnimals.map((animal) => (
-          <Card key={animal.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-blue-600" />
+      {viewMode === 'map' ? (
+        <AnimalMap animals={filteredAnimals} selectedBranch={selectedBranch} />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredAnimals.map((animal) => (
+            <Card key={animal.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <Users className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">{animal.tagId}</CardTitle>
+                      <CardDescription>{animal.breed}</CardDescription>
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className="text-lg">{animal.tagId}</CardTitle>
-                    <CardDescription>{animal.breed}</CardDescription>
+                  <div className={`w-3 h-3 rounded-full ${getHealthStatusColor(animal.healthStatus)}`} />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Age:</span>
+                    <span className="font-medium">{animal.age} years</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Weight:</span>
+                    <span className="font-medium">{animal.weight} kg</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Health:</span>
+                    <Badge variant={animal.healthStatus === 'Healthy' ? 'default' : 'secondary'}>
+                      {animal.healthStatus}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Farm:</span>
+                    <span className="font-medium text-xs">{animal.branchName}</span>
+                  </div>
+                  <div className="flex space-x-2 pt-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(animal)}
+                      className="flex-1"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(animal.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
-                <div className={`w-3 h-3 rounded-full ${getHealthStatusColor(animal.healthStatus)}`} />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Age:</span>
-                  <span className="font-medium">{animal.age} years</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Weight:</span>
-                  <span className="font-medium">{animal.weight} kg</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Health:</span>
-                  <Badge variant={animal.healthStatus === 'Healthy' ? 'default' : 'secondary'}>
-                    {animal.healthStatus}
-                  </Badge>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Farm:</span>
-                  <span className="font-medium text-xs">{animal.branchName}</span>
-                </div>
-                <div className="flex space-x-2 pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(animal)}
-                    className="flex-1"
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(animal.id)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
